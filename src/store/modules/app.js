@@ -1,6 +1,7 @@
 import Cookies from 'js-cookie'
 
 const app = {
+  namespaced: true,
   state: {
     sidebar: {
       opened: !+Cookies.get('sidebarStatus')
@@ -14,11 +15,6 @@ const app = {
         Cookies.set('sidebarStatus', 0)
       }
       state.sidebar.opened = !state.sidebar.opened
-    }
-  },
-  actions: {
-    ToggleSideBar: ({ commit }) => {
-      commit('TOGGLE_SIDEBAR')
     }
   }
 }

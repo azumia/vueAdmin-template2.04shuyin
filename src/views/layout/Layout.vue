@@ -13,6 +13,7 @@
 
 <script>
 import { Navbar, Sidebar, AppMain } from '@/views/layout'
+import { mapState } from 'vuex'
 
 export default {
   name: 'layout',
@@ -22,9 +23,16 @@ export default {
     AppMain
   },
   computed: {
-    sidebar() {
-      return this.$store.state.app.sidebar
-    }
+    // sidebar() {
+    //   console.log(this.$store)
+    //   return this.$store.state.app.sidebar
+    // },
+    ...mapState('app', [
+      'sidebar'
+    ])
+  },
+  mounted: function() {
+    // console.log('0002')
   }
 }
 </script>
@@ -71,6 +79,7 @@ export default {
             left: 0;
             right: -17px;
             overflow-y: scroll;
+            overflow-x: hidden;
         }
         .main-container {
             min-height: 100%;

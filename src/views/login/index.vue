@@ -29,6 +29,9 @@
 
 <script>
 import { isvalidUsername } from '@/utils/validate'
+import { login } from '@/api/login'
+import { setToken } from '@/utils/auth'
+import { mapMutations } from 'vuex'
 
 export default {
   name: 'login',
@@ -60,15 +63,31 @@ export default {
     }
   },
   methods: {
+    ...mapMutations('user', [
+      'SET_TOKEN'
+    ]),
     handleLogin() {
+      var _this = this
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
-          this.$store.dispatch('Login', this.loginForm).then(() => {
-            this.loading = false
-            this.$router.push({ path: '/' })
+          const username = this.loginForm.username.trim()
+          new Promise((resolve, reject) => {
+            login(username, _this.loginForm.password).then(response => {
+              const data = response.data
+              // 登录成功，往cookie中写入token
+              setToken(data.token)
+              // 往vuex中写入token
+              _this.SET_TOKEN({ token: data.token })
+              resolve()
+            }).catch(err => {
+              reject(err)
+            })
+          }).then(() => {
+            _this.loading = false
+            _this.$router.push('/')
           }).catch(() => {
-            this.loading = false
+            _this.loading = false
           })
         } else {
           console.log('error submit!!')

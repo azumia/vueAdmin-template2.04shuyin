@@ -2,7 +2,7 @@
   <el-menu class="navbar" mode="horizontal">
     <hamburger class="hamburger-container" :toggleClick="toggleSideBar" :isActive="sidebar.opened"></hamburger>
     <levelbar></levelbar>
-    <el-dropdown class="avatar-container" trigger="click">
+    <el-dropdown class="avatar-container" trigger="hover">
       <div class="avatar-wrapper">
         <img class="user-avatar" :src="avatar+'?imageView2/1/w/80/h/80'">
         <i class="el-icon-caret-bottom"></i>
@@ -20,9 +20,11 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapState } from 'vuex'
 import Levelbar from './Levelbar'
 import Hamburger from '@/components/Hamburger'
+import { logout } from '@/api/login'
+import { removeToken } from '@/utils/auth'
 
 export default {
   components: {
@@ -30,17 +32,31 @@ export default {
     Hamburger
   },
   computed: {
-    ...mapGetters([
-      'sidebar',
+    ...mapState('user', [
+      'token',
       'avatar'
+    ]),
+    ...mapState('app', [
+      'sidebar'
     ])
   },
   methods: {
     toggleSideBar() {
-      this.$store.dispatch('ToggleSideBar')
+      this.$store.commit('app/TOGGLE_SIDEBAR')
     },
     logout() {
-      this.$store.dispatch('LogOut').then(() => {
+      var _this = this
+      return new Promise((resolve, reject) => {
+        // 清空相关登录信息
+        logout(_this.token).then(() => {
+          _this.$store.commit('user/SET_TOKEN', '')
+          _this.$store.commit('user/SET_ROLES', [])
+          removeToken()
+          resolve()
+        }).catch(error => {
+          reject(error)
+        })
+      }).then(() => {
         location.reload()  // 为了重新实例化vue-router对象 避免bug
       })
     }
