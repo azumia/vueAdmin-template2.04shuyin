@@ -7,3 +7,11 @@ export function getList(params) {
     params
   })
 }
+
+export function getImgList(params) {
+  return fetch({
+    url: '/show/get_show_img_list',
+    method: 'get',
+    params
+  })
+}
